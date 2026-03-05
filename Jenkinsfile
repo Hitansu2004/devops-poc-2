@@ -10,6 +10,8 @@ pipeline {
         IMAGE_NAME = "mypoc2app"
         REGISTRY = "localhost:5000" // We are using a local private registry
         BUILD_TAG = "build-${env.BUILD_NUMBER}"
+        // Add Rancher Desktop bin to PATH so docker-credential-osxkeychain is found!
+        PATH = "/Users/hparichha/.rd/bin:${env.PATH}"
     }
 
     stages {
