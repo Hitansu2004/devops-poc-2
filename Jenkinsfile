@@ -34,7 +34,7 @@ pipeline {
                 stage('Test') {
                     steps {
                         echo "Running Backend Unit Tests..."
-                        dir('poc 2 jenkins/my-docker-app') {
+                        dir('my-docker-app') {
                             sh '/usr/local/bin/mvn clean test'
                         }
                     }
