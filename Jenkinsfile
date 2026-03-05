@@ -45,7 +45,7 @@ pipeline {
         stage('Build Java Backend') {
             steps {
                 echo "Packaging the Java Backend (skipping tests since they passed)..."
-                dir('poc 2 jenkins/my-docker-app') {
+                dir('my-docker-app') {
                     sh '/usr/local/bin/mvn package -DskipTests'
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker Image inside poc 2 jenkins folder..."
-                dir('poc 2 jenkins/my-docker-app') {
+                dir('my-docker-app') {
                     // Tagging it with the build number as requested
                     sh "docker build -t hitansu/${IMAGE_NAME}:${BUILD_TAG} ."
                     sh "docker tag hitansu/${IMAGE_NAME}:${BUILD_TAG} hitansu/${IMAGE_NAME}:latest"
