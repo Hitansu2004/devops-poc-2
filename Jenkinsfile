@@ -8,7 +8,7 @@ pipeline {
     environment {
         // Tagging with build number as requested in POC 2 objectives
         IMAGE_NAME = "mypoc2app"
-        DOCKERHUB_CREDENTIALS_ID = 'dockerhub-creds' // We will configure this in Jenkins later
+        REGISTRY = "localhost:5000" // We are using a local private registry
         BUILD_TAG = "build-${env.BUILD_NUMBER}"
     }
 
@@ -56,20 +56,18 @@ pipeline {
                 echo "Building Docker Image inside poc 2 jenkins folder..."
                 dir('my-docker-app') {
                     // Tagging it with the build number as requested
-                    sh "docker build -t hitansu/${IMAGE_NAME}:${BUILD_TAG} ."
-                    sh "docker tag hitansu/${IMAGE_NAME}:${BUILD_TAG} hitansu/${IMAGE_NAME}:latest"
+                    sh "docker build -t ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ."
+                    sh "docker tag ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ${REGISTRY}/${IMAGE_NAME}:latest"
                 }
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push to Private Registry') {
             steps {
-                echo "Logging into DockerHub and pushing image..."
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS_ID}", usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                    sh 'echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin'
-                    sh "docker push hitansu/${IMAGE_NAME}:${BUILD_TAG}"
-                    sh "docker push hitansu/${IMAGE_NAME}:latest"
-                }
+                echo "Pushing image to the Local Private Registry..."
+                // Since it is a local internal registry, we don't need credentials!
+                sh "docker push ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG}"
+                sh "docker push ${REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
     }
@@ -77,11 +75,11 @@ pipeline {
     post {
         always {
             echo "Cleaning up local docker images to save space..."
-            sh "docker rmi hitansu/${IMAGE_NAME}:${BUILD_TAG} || true"
-            sh "docker rmi hitansu/${IMAGE_NAME}:latest || true"
+            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} || true"
+            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:latest || true"
         }
         success {
-            echo "Successfully pushed hitansu/${IMAGE_NAME}:${BUILD_TAG} to DockerHub!"
+            echo "Successfully pushed ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} to Private Registry!"
         }
         failure {
             echo "Pipeline failed! Please check the logs."
