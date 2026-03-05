@@ -56,8 +56,8 @@ pipeline {
                 echo "Building Docker Image inside poc 2 jenkins folder..."
                 dir('my-docker-app') {
                     // Tagging it with the build number as requested
-                    sh "docker build -t ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ."
-                    sh "docker tag ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ${REGISTRY}/${IMAGE_NAME}:latest"
+                    sh "/Users/hparichha/.rd/bin/docker build -t ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ."
+                    sh "/Users/hparichha/.rd/bin/docker tag ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} ${REGISTRY}/${IMAGE_NAME}:latest"
                 }
             }
         }
@@ -66,8 +66,8 @@ pipeline {
             steps {
                 echo "Pushing image to the Local Private Registry..."
                 // Since it is a local internal registry, we don't need credentials!
-                sh "docker push ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG}"
-                sh "docker push ${REGISTRY}/${IMAGE_NAME}:latest"
+                sh "/Users/hparichha/.rd/bin/docker push ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG}"
+                sh "/Users/hparichha/.rd/bin/docker push ${REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
     }
@@ -75,8 +75,8 @@ pipeline {
     post {
         always {
             echo "Cleaning up local docker images to save space..."
-            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} || true"
-            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:latest || true"
+            sh "/Users/hparichha/.rd/bin/docker rmi ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} || true"
+            sh "/Users/hparichha/.rd/bin/docker rmi ${REGISTRY}/${IMAGE_NAME}:latest || true"
         }
         success {
             echo "Successfully pushed ${REGISTRY}/${IMAGE_NAME}:${BUILD_TAG} to Private Registry!"
